@@ -32,8 +32,8 @@ def ask():
     included += input("Enter any new included (yellow and green) letters: ").lower()
     excluded += input("Enter any new excluded (dark grey) letters: ").lower()
     partial_word_input = input("Enter the letters of the word you know are in the correct position (all green letters), using * as a wildcard (no green in the column): " ).lower()
-    for i in partial_word_input:
-        partial_word[i] = partial_word_input
+    for i in range(5):
+        partial_word[i] = partial_word_input[i]
     for i in range(5):
         yellow[i] += input("Enter any new yellow letters in column " + str(i + 1) + ": ")
 
@@ -131,12 +131,12 @@ def print_frequencies():
         count += 1
 
 def main():
-    #ask()
-    #solve()
-    #populate_frequencies()
-    #score_words()
-    #print_words()
-    check_word()
+    ask()
+    solve()
+    populate_frequencies()
+    score_words()
+    print_words()
+    #check_word()
 
 possible_words = ['treat']
 solution = 'treat'
@@ -161,5 +161,5 @@ def check_word():
 
     
 
-#while True:
-main()
+while True:
+    main()
