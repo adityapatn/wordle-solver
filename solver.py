@@ -32,6 +32,8 @@ def ask():
     included += input("Enter any new included (yellow and green) letters: ").lower()
     excluded += input("Enter any new excluded (dark grey) letters: ").lower()
     partial_word_input = input("Enter the letters of the word you know are in the correct position (all green letters), using * as a wildcard (no green in the column): " ).lower()
+    if not partial_word_input:
+        partial_word_input = "*****"
     for i in range(5):
         partial_word[i] = partial_word_input[i]
     for i in range(5):
