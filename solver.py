@@ -9,41 +9,43 @@ for i in chars:
     if i == "\n":
         chars.remove(i)
 file.close()
-#print(chars)
-#print(word_list)
 
-included = ""
-excluded = ""
+included = []
+excluded = []
 partial_word = ["*"] * 5
 yellow = ["", "", "", "", ""]
 possible_words = []
 word_scores = []
 solution = ""
+doubles = []
 
 def reset():
-    global included, excluded, partial_word, yellow
-    included = ""
-    excluded = ""
+    global included, excluded, partial_word, yellow, doubles
+    included = []
+    excluded = []
     partial_word = ["*"] * 5
     yellow = ["", "", "", "", ""]
+    doubles = []
 
 def ask():
     global included, excluded, partial_word, yellow
-    included += input("Enter any new included (yellow and green) letters: ").lower()
-    excluded += input("Enter any new excluded (dark grey) letters: ").lower()
-    partial_word_input = input("Enter the letters of the word you know are in the correct position (all green letters), using * as a wildcard (no green in the column): " ).lower()
+    included_input = input("Enter any new included (yellow and green) letters: ").lower().strip()
+    for i in included_input:
+        included.append(i)
+    excluded_input = input("Enter any new excluded (dark grey) letters: ").lower().strip()
+    for i in excluded_input:
+        excluded.append(i)
+    partial_word_input = input("Enter the letters of the word you know are in the correct position (all green letters), using * as a wildcard (no green in the column): " ).lower().strip()
     if not partial_word_input:
         partial_word_input = "*****"
     for i in range(5):
         partial_word[i] = partial_word_input[i]
     for i in range(5):
-        yellow[i] += input("Enter any new yellow letters in column " + str(i + 1) + ": ")
-
-
+        yellow[i] += input("Enter any new yellow letters in column " + str(i + 1) + ": ").lower().strip()
 
 def handle_word(i): #appends all possible words to possible_words, returns nothing
     for j in excluded:
-        if j in i:
+        if j in i and not j in included: #we need to include a clause here that if the letter (represented by var j) is in both included and excluded, we shouldn't throw out the word.
             return
 
     for j in included:
@@ -59,8 +61,12 @@ def handle_word(i): #appends all possible words to possible_words, returns nothi
             for l in k: #iterate through every yellow letter in the column
                 if j == l: #if the first letter is one we know is yellow in that column, throw out i
                     return
+    for j in included:
+        if j in excluded:
+            doubles.append(j)
+            
         
-    possible_words.append(i)
+    possible_words.append(i) #adds the word (if it passes all the checks) to possible_words
 
 def solve():
     global possible_words
@@ -159,9 +165,5 @@ def check_word():
 
     #There's a problem with the original solver where if you input a guess with double letters, like 'sieve', and only the 5th letter of the solution is e, the first e in sieve will be scored as grey, and the second as green. If e is inputted as both included and excluded (although it is actually in the word), the solution set will be calculated as 0. The algorithm is not equipped to handle double letters.
              
-
-
-    
-
 while True:
     main()
