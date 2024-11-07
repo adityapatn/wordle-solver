@@ -17,19 +17,24 @@ yellow = ["", "", "", "", ""]
 possible_words = []
 word_scores = []
 solution = ""
-doubles = []
+singles = []
+multiples = []
 
 def reset():
-    global included, excluded, partial_word, yellow, doubles
+    global included, excluded, partial_word, yellow, singles
     included = []
     excluded = []
     partial_word = ["*"] * 5
     yellow = ["", "", "", "", ""]
-    doubles = []
+    singles = []
+    multiples = []
 
 def ask():
-    global included, excluded, partial_word, yellow
+    global included, excluded, partial_word, yellow, multiples
     included_input = input("Enter any new included (yellow and green) letters: ").lower().strip()
+    for i in included_input:
+        if included_input.count(i) > 1:
+            multiples.append(i)
     for i in included_input:
         included.append(i)
     excluded_input = input("Enter any new excluded (dark grey) letters: ").lower().strip()
@@ -63,7 +68,15 @@ def handle_word(i): #appends all possible words to possible_words, returns nothi
                     return
     for j in included:
         if j in excluded:
-            doubles.append(j)
+            singles.append(j)
+    
+    for j in singles:
+        if i.count(j) > 1:
+            return
+    
+    for j in multiples:
+        if i.count(j) < 2:
+            return
             
         
     possible_words.append(i) #adds the word (if it passes all the checks) to possible_words
