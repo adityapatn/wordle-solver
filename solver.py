@@ -98,7 +98,7 @@ def calculate_frequency(letter):
     return percent
 
 letter_frequencies = {}
-alphabet = "abcdefghijklmnopqrstuvwxyz"
+alphabet = "abcdefghijklmnopqrstuvwxyz'-"
 frequency_list = []
 
 def populate_frequencies(): #goes through the entire alphabet and creates frequency scores for each letter, appends to and sorts frequency list
@@ -131,7 +131,7 @@ def print_words(): #outputs the sorted list of possible words and their scores
     global final_guesses, guesses, count
     if not computer:
         print("")
-        print("%d total results out of 2315 possible answers (%.2f%%)." % (len(possible_words), 100.0 * len(possible_words) / 2315))
+        print("%d total results out of %d possible answers (%.2f%%)." % (len(possible_words), len(word_list), 100.0 * len(possible_words) / len(word_list)))
     final_guesses = list(zip(possible_words, word_scores))
     final_guesses.sort(reverse=True, key=return_second)
     if debug:
@@ -143,7 +143,7 @@ def print_words(): #outputs the sorted list of possible words and their scores
     for i in final_guesses[:10]: 
         count += 1
         if computer:
-            print("%2d: %s (%.2f): best of %d results (%.2f%%)." % (count, i[0], i[1], len(possible_words), 100.0 * len(possible_words) / 2315))
+            print("%2d: %s (%.2f): best of %d results (%.2f%%)." % (count, i[0], i[1], len(possible_words), 100.0 * len(possible_words) / len(word_list)))
             break            
         else:
             print("%2d: %s (%.2f)" % (count, i[0], i[1]))
@@ -207,8 +207,7 @@ def check_word():
         sys.exit()
     else:
         guesses += 1
-        
-        if guesses > 7:
+        if guesses > 20 and not (solution in word_list):
             print("Your word is not an official wordle solution.")
             sys.exit()
 
@@ -217,10 +216,29 @@ debug = False
 
 if 'e' in computer:
     file = open('wordlist_fives.txt', 'r')
+    print("Resorting to english dictionary.")
+    data = file.read()
+    word_list = data.split()
+    chars = list(data)
+    for i in chars:
+        if i == "\n":
+            chars.remove(i)
+    file.close()
 else:
     file = open('shuffled_real_wordles.txt', 'r')
+    data = file.read()
+    word_list = data.split()
+    chars = list(data)
+    for i in chars:
+        if i == "\n":
+            chars.remove(i)
+    file.close()
+
 if 'd' in computer:
     debug = True
+
+if debug:
+    print("Word list:", word_list)
 
 computer = ''.join(c for c in computer if c.isdigit())
 computer = int(computer)
@@ -236,13 +254,7 @@ if computer:
 
 reset()
 
-data = file.read()
-word_list = data.split()
-chars = list(data)
-for i in chars:
-    if i == "\n":
-        chars.remove(i)
-file.close()
+
 
 while True:
     main()
