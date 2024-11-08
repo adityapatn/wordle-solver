@@ -21,7 +21,8 @@ singles = []
 multiples = []
 final_guesses = []
 guesses = 0
-mode = 0
+computer = 0
+count = 0
 
 def reset():
     global included, excluded, partial_word, yellow, singles, multiples
@@ -51,9 +52,9 @@ def ask():
     for i in range(len(solution)):
         yellow[i] += input("Enter any new yellow letters in column " + str(i + 1) + ": ").lower().strip()
 
-def handle_word(i): #appends all possible words to possible_words, returns nothing
+def handle_word(i): #appends a word to possible_words, returns nothing
     for j in excluded:
-        if j in i and not j in included: #we need to include a clause here that if the letter (represented by var j) is in both included and excluded, we shouldn't throw out the word.
+        if j in i and not j in included: #we need to include a clause here that if the letter (represented by var j) is in both included and excluded for the word i, we shouldn't throw out the word.
             return
 
     for j in included:
@@ -134,17 +135,27 @@ def return_second(x): #returns the second item of a tuple, used in sorting the t
     return x[1]
 
 def print_words(): #outputs the sorted list of possible words and their scores
-    global final_guesses
-    print("")
-    #print(str(len(possible_words)) + " total results out of 2315 possible answers (" + str( + "%).".format(round((len(possible_words) / 2315) * 100), 2)))
-    print("%d total results out of 2315 possible answers (%.2f%%)." % (len(possible_words), 100.0 * len(possible_words) / 2315))
+    global final_guesses, guesses, count
+    if not computer:
+        print("")
+        print("%d total results out of 2315 possible answers (%.2f%%)." % (len(possible_words), 100.0 * len(possible_words) / 2315))
     final_guesses = list(zip(possible_words, word_scores))
     final_guesses.sort(reverse=True, key=return_second)
-    count = 1
-    for i in final_guesses[:10]:
-        #print("%2d: %s" + str(i[0]) + " (" + str(i[1]) + ")" % (count))
-        print("%2d: %s (%.2f)" % (count, i[0], i[1]))
+
+    #print("Computer:", computer)
+    #print("Guesses:", guesses)
+    if not(computer and (guesses >= 2)): #count = 0 should be skipped only if computer is true and it is not the first guess
+        count = 0
+    
+    for i in final_guesses[:10]: 
         count += 1
+        if computer:
+            print("%2d: %s (%.2f): best of %d results (%.2f%%)." % (count, i[0], i[1], len(possible_words), 100.0 * len(possible_words) / 2315))
+            break            
+        else:
+            print("%2d: %s (%.2f)" % (count, i[0], i[1]))
+
+    #I want count to get printed at 1 and then increase every print statement if computer is false, being reset back to 0 every function call. If computer is true, I want count to get incremented, then break before the next print, but increment count, and don't reset it every function call
 
 def print_frequencies():
     count = 1
@@ -154,34 +165,33 @@ def print_frequencies():
 
 def main():
     global solution
-    if mode:
-        reset()
+    if computer:
         check_word()
     else:
-        reset()
         ask()
     solve()
     populate_frequencies()
     score_words()
     print_words()
+    #input("\nContinue?")
 
 def check_word():
     global included, excluded, partial_word, yellow, solution, final_guesses, guesses
-    reset()
     if possible_words and solution:
         word = final_guesses[0][0] #check the most likely word in the list first
         for i in range(len(solution)): #if the letters of word and solution match, make it green. If they don't, but it is somewhere else in the word, make it yellow.
-            if word[i] == solution[i]:
-                partial_word[i] = word[i]
-                included.append(word[i])
-            elif word[i] in solution: #it should be scored yellow since it appears somewhere else in the word
-                yellow[i] += word[i] #add the letter to the yellow letters in that column
-                included.append(word[i])
+            letter = word[i]
+            if letter == solution[i]:
+                partial_word[i] = letter
+                included.append(letter)
+            elif letter in solution: #it should be scored yellow since it appears somewhere else in the word
+                yellow[i] += letter #add the letter to the yellow letters in that column
+                included.append(letter)
             else:
                 excluded.append(word[i]) #exclude it/score it as grey
-            if solution.count(word[i]) > 1 and not word[i] in multiples:
+            if solution.count(word[i]) > 1 and word.count(word[i]) > 1 and not word[i] in multiples:
                 multiples.append(word[i])
-        print("I guessed %s." % (word))
+        #print("I guessed %s." % (word))
         #print("Included:", included)
         #print("Excluded:", excluded)
         #print("Partial word:", partial_word)
@@ -194,11 +204,12 @@ def check_word():
     else:
         guesses += 1
 
-mode = int(input("Enter 0 to assist you in solving a wordle or 1 to enter a solution and test the computer."))
-if mode:
+computer = int(input("Enter 0 to assist you in solving a wordle or 1 to enter a solution and test the computer: "))
+if computer:
     solution = input("Enter a word that you want the computer to try and find: ")
 
+reset()
 while True:
     main()
-    
-    
+
+#something is wrong with the doubles code
