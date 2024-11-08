@@ -2,15 +2,6 @@ import sys
 import csv
 # Open the file in read mode
 
-file = open('shuffled_real_wordles.txt', 'r')
-data = file.read()
-word_list = data.split()
-chars = list(data)
-for i in chars:
-    if i == "\n":
-        chars.remove(i)
-file.close()
-
 included = []
 excluded = []
 partial_word = []
@@ -143,9 +134,9 @@ def print_words(): #outputs the sorted list of possible words and their scores
         print("%d total results out of 2315 possible answers (%.2f%%)." % (len(possible_words), 100.0 * len(possible_words) / 2315))
     final_guesses = list(zip(possible_words, word_scores))
     final_guesses.sort(reverse=True, key=return_second)
-
-    #print("Computer:", computer)
-    #print("Guesses:", guesses)
+    if debug:
+        print("Computer:", computer)
+        print("Guesses:", guesses)
     if not(computer and (guesses >= 2)): #count = 0 should be skipped only if computer is true and it is not the first guess
         count = 0
     
@@ -174,11 +165,14 @@ def main():
     solve()
     populate_frequencies()
     score_words()
+    if debug:
+        print_frequencies()
     print_words()
-    #input("\nContinue?")
+    if debug:
+        input("\nContinue?")
 
 def check_word():
-    global included, excluded, partial_word, yellow, solution, final_guesses, guesses, guesslist
+    global included, excluded, partial_word, yellow, solution, final_guesses, guesses, guesslist, word_list
     if possible_words and solution:
         word = final_guesses[0][0] #check the most likely word in the list first
         for i in range(len(solution)): #if the letters of word and solution match, make it green. If they don't, but it is somewhere else in the word, make it yellow.
@@ -193,22 +187,22 @@ def check_word():
                 excluded.append(word[i]) #exclude it/score it as grey
             if solution.count(word[i]) > 1 and word.count(word[i]) > 1 and not word[i] in multiples:
                 multiples.append(word[i])
-        #print("I guessed %s." % (word))
-        #print("Included:", included)
-        #print("Excluded:", excluded)
-        #print("Partial word:", partial_word)
-        #print("Yellow letters:", yellow)
-        #print("Multiples:", multiples)
+        if debug:
+            print("I guessed %s." % (word))
+            print("Included:", included)
+            print("Excluded:", excluded)
+            print("Partial word:", partial_word)
+            print("Yellow letters:", yellow)
+            print("Multiples:", multiples)
     
         guesslist.append(word)
 
     if not "*" in partial_word:
         print("I correctly guessed %s in %i tries." % (word, guesses))
         guessstring = ','.join(guesslist) + "\n"
-        print(guessstring)
+        if debug:
+            print("Guess string:", guessstring)
         with open('computersolves.csv', 'a') as file:
-            #writer = csv.writer(file)
-            #writer.writerows(guessstring)
             file.write(guessstring)
         sys.exit()
     else:
@@ -217,9 +211,20 @@ def check_word():
         if guesses > 7:
             print("Your word is not an official wordle solution.")
             sys.exit()
-    
 
-computer = int(input("Enter 0 to assist you in solving a wordle or 1 to enter a solution and test the computer: "))
+computer = input("Enter 0 to assist you in solving a wordle or 1 (e for entire English subset, d for debug mode) to enter a solution and test the computer: ")
+debug = False
+
+if 'e' in computer:
+    file = open('wordlist_fives.txt', 'r')
+else:
+    file = open('shuffled_real_wordles.txt', 'r')
+if 'd' in computer:
+    debug = True
+
+computer = ''.join(c for c in computer if c.isdigit())
+computer = int(computer)
+
 if computer:
     solution = input("Enter a word that you want the computer to try and find: ")
     if len(solution) > 5:
@@ -230,7 +235,16 @@ if computer:
         sys.exit()
 
 reset()
+
+data = file.read()
+word_list = data.split()
+chars = list(data)
+for i in chars:
+    if i == "\n":
+        chars.remove(i)
+file.close()
+
 while True:
     main()
 
-#The next step is to refactor the entire program to use local variables instead of global variables to reduce the chance of functions breaking each other and make the program easier to debug
+#The next step is to refactor the entire program to use local variables instead of global variables to reduce the chance of functions interfering with each other and make the program easier to debug
