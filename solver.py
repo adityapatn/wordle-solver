@@ -21,7 +21,7 @@ singles = []
 multiples = []
 
 def reset():
-    global included, excluded, partial_word, yellow, singles
+    global included, excluded, partial_word, yellow, singles, multiples
     included = []
     excluded = []
     partial_word = ["*"] * 5
@@ -66,6 +66,7 @@ def handle_word(i): #appends all possible words to possible_words, returns nothi
             for l in k: #iterate through every yellow letter in the column
                 if j == l: #if the first letter is one we know is yellow in that column, throw out i
                     return
+    
     for j in included:
         if j in excluded:
             singles.append(j)
@@ -77,17 +78,14 @@ def handle_word(i): #appends all possible words to possible_words, returns nothi
     for j in multiples:
         if i.count(j) < 2:
             return
-            
-        
+
     possible_words.append(i) #adds the word (if it passes all the checks) to possible_words
 
-def solve():
+def solve(): #possible_words is now full
     global possible_words
     possible_words = []
     for i in word_list:
         handle_word(i)
-
-#possible_words is now full
 
 letter_scores = {'e': 56.88, 'a': 43.31, 'r': 38.64, 'i': 38.45, 'o': 36.51, 't': 35.43, 'n': 33.92, 's': 29.23, 'l': 27.98, 'c': 23.13, 'u': 18.51, 'd': 17.25, 'p': 16.14, 'm': 15.36, 'h': 15.31, 'g': 12.59, 'b': 10.56, 'f': 9.24, 'y': 9.06, 'w': 6.57, 'k': 5.61, 'v': 5.13, 'x': 1.48, 'z': 1.39, 'j': 1.00, 'q': 1.00}
 score_list = list(letter_scores.items())
@@ -106,7 +104,7 @@ letter_frequencies = {}
 alphabet = "abcdefghijklmnopqrstuvwxyz"
 frequency_list = []
 
-def populate_frequencies():
+def populate_frequencies(): #goes through the entire alphabet and creates frequency scores for each letter, appends to and sorts frequency list
     global frequency_list
     for i in alphabet:
         letter_frequencies[i] = calculate_frequency(i)
@@ -126,7 +124,6 @@ def score_words(): #takes all words in possible_words and assigns scores to them
                 letters_in_word += j
         word_score = round(word_score, 4)
         word_scores.append(word_score)
-    #print("Word scores:", word_scores)
 
 #word_scores is now full
 
@@ -152,31 +149,45 @@ def print_frequencies():
         count += 1
 
 def main():
-    ask()
+    #ask()
+    check_word()
     solve()
     populate_frequencies()
     score_words()
     print_words()
-    #check_word()
 
-possible_words = ['treat']
-solution = 'treat'
+possible_words = []
+solution = "treat"
 
 def check_word():
     global included, excluded, partial_word, yellow, solution
     reset()
+    if possible_words and solution:
+        word = possible_words[0] #check the most likely word in the list first
+        for i in range(5): #if the letters of word and solution match, make it green. If they don't, but it is somewhere else in the word, make it yellow.
+            if word[i] == solution[i]:
+                partial_word[i] = word[i]
+                included.append(word[i])
+            elif word[i] in solution: #it should be scored yellow since it appears somewhere else in the word
+                yellow[i] += word[i] #add the letter to the yellow letters in that column
+            else:
+                excluded.append(word[i]) #exclude it/score it as grey
+            if solution.count(word[i]) > 1 and not word[i] in multiples:
+                multiples.append(word[i])
+        print("I guessed %s." % (word))
+        print("Included:", included)
+        print("Excluded:", excluded)
+        print("Partial word:", partial_word)
+        print("Yellow letters:", yellow)
+        print("Multiples:", multiples)
+    if not "*" in partial_word:
+        print("The solution was %s." % (partial_word))
+        sys.exit()
 
-    word = possible_words[0]
-    index = [0, 1, 2, 3, 4]
-    for i in range(5): #if the letters of word and solution match, make it green. If they don't, but it is somewhere else in the word, make it yellow.
-        if word[i] == solution[i]:
-            partial_word[i] = word[i]
-        elif word[i] in solution: #it should be scored yellow since it appears somewhere else in the word
-            yellow[i] += word[i] #add the letter to the yellow letters in that column
-        else:
-            excluded += word[i] #exclude it/score it as grey
-
-    #There's a problem with the original solver where if you input a guess with double letters, like 'sieve', and only the 5th letter of the solution is e, the first e in sieve will be scored as grey, and the second as green. If e is inputted as both included and excluded (although it is actually in the word), the solution set will be calculated as 0. The algorithm is not equipped to handle double letters.
-             
 while True:
     main()
+    input("Continue?")
+
+#check_word()
+
+#The check_word() function fails here because it is randomly choosing guesses from possible_words, instead of the top result. I believe this is because it is guessing from possible_words before it is sorted, although I don't know why.
