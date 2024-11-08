@@ -84,7 +84,7 @@ def solve(): #possible_words is now full
     for i in word_list:
         handle_word(i)
 
-letter_scores = {'e': 56.88, 'a': 43.31, 'r': 38.64, 'i': 38.45, 'o': 36.51, 't': 35.43, 'n': 33.92, 's': 29.23, 'l': 27.98, 'c': 23.13, 'u': 18.51, 'd': 17.25, 'p': 16.14, 'm': 15.36, 'h': 15.31, 'g': 12.59, 'b': 10.56, 'f': 9.24, 'y': 9.06, 'w': 6.57, 'k': 5.61, 'v': 5.13, 'x': 1.48, 'z': 1.39, 'j': 1.00, 'q': 1.00}
+letter_scores = {'e': 56.88, 'a': 43.31, 'r': 38.64, 'i': 38.45, 'o': 36.51, 't': 35.43, 'n': 33.92, 's': 29.23, 'l': 27.98, 'c': 23.13, 'u': 18.51, 'd': 17.25, 'p': 16.14, 'm': 15.36, 'h': 15.31, 'g': 12.59, 'b': 10.56, 'f': 9.24, 'y': 9.06, 'w': 6.57, 'k': 5.61, 'v': 5.13, 'x': 1.48, 'z': 1.39, 'j': 1.00, 'q': 1.00, "'": 1, "-": 1}
 score_list = list(letter_scores.items())
 
 def calculate_frequency(letter):
@@ -102,11 +102,14 @@ alphabet = "abcdefghijklmnopqrstuvwxyz'-"
 frequency_list = []
 
 def populate_frequencies(): #goes through the entire alphabet and creates frequency scores for each letter, appends to and sorts frequency list
-    global frequency_list
-    for i in alphabet:
-        letter_frequencies[i] = calculate_frequency(i)
-    
-    frequency_list = list(letter_frequencies.items())
+    global frequency_list, letter_frequencies
+    if not all_english:
+        for i in alphabet:
+            letter_frequencies[i] = calculate_frequency(i)
+        frequency_list = list(letter_frequencies.items())
+    else:
+        letter_frequencies = letter_scores
+        frequency_list = score_list
     frequency_list.sort(reverse=True, key=return_second)
 
 def score_words(): #takes all words in possible_words and assigns scores to them, appends scores to word_scores
@@ -211,10 +214,12 @@ def check_word():
             print("Your word is not an official wordle solution.")
             sys.exit()
 
-computer = input("Enter 0 to assist you in solving a wordle or 1 (e for entire English subset, d for debug mode) to enter a solution and test the computer: ")
+computer = input("Enter 0 to assist you in solving a wordle or 1 (e for entire English solution set, d for debug mode) to enter a solution and test the computer: ")
 debug = False
+all_english = False
 
 if 'e' in computer:
+    all_english = True
     file = open('wordlist_fives.txt', 'r')
     print("Resorting to english dictionary.")
     data = file.read()
@@ -245,12 +250,12 @@ computer = int(computer)
 
 if computer:
     solution = input("Enter a word that you want the computer to try and find: ")
-    if len(solution) > 5:
+    '''if len(solution) > 5:
         solution = solution[0:5:]
         print("Your word has been shortened to %s." % (solution))
     elif len(solution) < 5:
         print("That is too short. Try again.")
-        sys.exit()
+        sys.exit()'''
 
 reset()
 
