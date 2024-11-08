@@ -1,4 +1,5 @@
 import sys
+import csv
 # Open the file in read mode
 
 file = open('shuffled_real_wordles.txt', 'r')
@@ -23,6 +24,7 @@ final_guesses = []
 guesses = 0
 computer = 0
 count = 0
+guesslist = []
 
 def reset():
     global included, excluded, partial_word, yellow, singles, multiples
@@ -176,7 +178,7 @@ def main():
     #input("\nContinue?")
 
 def check_word():
-    global included, excluded, partial_word, yellow, solution, final_guesses, guesses
+    global included, excluded, partial_word, yellow, solution, final_guesses, guesses, guesslist
     if possible_words and solution:
         word = final_guesses[0][0] #check the most likely word in the list first
         for i in range(len(solution)): #if the letters of word and solution match, make it green. If they don't, but it is somewhere else in the word, make it yellow.
@@ -197,19 +199,38 @@ def check_word():
         #print("Partial word:", partial_word)
         #print("Yellow letters:", yellow)
         #print("Multiples:", multiples)
+    
+        guesslist.append(word)
+
     if not "*" in partial_word:
         print("I correctly guessed %s in %i tries." % (word, guesses))
-        
+        guessstring = ','.join(guesslist) + "\n"
+        print(guessstring)
+        with open('computersolves.csv', 'a') as file:
+            #writer = csv.writer(file)
+            #writer.writerows(guessstring)
+            file.write(guessstring)
         sys.exit()
     else:
         guesses += 1
+        
+        if guesses > 7:
+            print("Your word is not an official wordle solution.")
+            sys.exit()
+    
 
 computer = int(input("Enter 0 to assist you in solving a wordle or 1 to enter a solution and test the computer: "))
 if computer:
     solution = input("Enter a word that you want the computer to try and find: ")
+    if len(solution) > 5:
+        solution = solution[0:5:]
+        print("Your word has been shortened to %s." % (solution))
+    elif len(solution) < 5:
+        print("That is too short. Try again.")
+        sys.exit()
 
 reset()
 while True:
     main()
 
-#something is wrong with the doubles code
+#The next step is to refactor the entire program to use local variables instead of global variables to reduce the chance of functions breaking each other and make the program easier to debug
