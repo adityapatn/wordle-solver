@@ -12,19 +12,22 @@ file.close()
 
 included = []
 excluded = []
-partial_word = ["*"] * 5
+partial_word = []
 yellow = ["", "", "", "", ""]
 possible_words = []
 word_scores = []
-solution = ""
+solution = "treat"
 singles = []
 multiples = []
+final_guesses = []
+guesses = 0
+mode = 0
 
 def reset():
     global included, excluded, partial_word, yellow, singles, multiples
     included = []
     excluded = []
-    partial_word = ["*"] * 5
+    partial_word = ["*"] * len(solution)
     yellow = ["", "", "", "", ""]
     singles = []
     multiples = []
@@ -42,10 +45,10 @@ def ask():
         excluded.append(i)
     partial_word_input = input("Enter the letters of the word you know are in the correct position (all green letters), using * as a wildcard (no green in the column): " ).lower().strip()
     if not partial_word_input:
-        partial_word_input = "*****"
-    for i in range(5):
+        partial_word_input = "*" * len(solution)
+    for i in range(len(solution)):
         partial_word[i] = partial_word_input[i]
-    for i in range(5):
+    for i in range(len(solution)):
         yellow[i] += input("Enter any new yellow letters in column " + str(i + 1) + ": ").lower().strip()
 
 def handle_word(i): #appends all possible words to possible_words, returns nothing
@@ -131,6 +134,7 @@ def return_second(x): #returns the second item of a tuple, used in sorting the t
     return x[1]
 
 def print_words(): #outputs the sorted list of possible words and their scores
+    global final_guesses
     print("")
     #print(str(len(possible_words)) + " total results out of 2315 possible answers (" + str( + "%).".format(round((len(possible_words) / 2315) * 100), 2)))
     print("%d total results out of 2315 possible answers (%.2f%%)." % (len(possible_words), 100.0 * len(possible_words) / 2315))
@@ -149,45 +153,52 @@ def print_frequencies():
         count += 1
 
 def main():
-    #ask()
-    check_word()
+    global solution
+    if mode:
+        reset()
+        check_word()
+    else:
+        reset()
+        ask()
     solve()
     populate_frequencies()
     score_words()
     print_words()
 
-possible_words = []
-solution = "treat"
-
 def check_word():
-    global included, excluded, partial_word, yellow, solution
+    global included, excluded, partial_word, yellow, solution, final_guesses, guesses
     reset()
     if possible_words and solution:
-        word = possible_words[0] #check the most likely word in the list first
-        for i in range(5): #if the letters of word and solution match, make it green. If they don't, but it is somewhere else in the word, make it yellow.
+        word = final_guesses[0][0] #check the most likely word in the list first
+        for i in range(len(solution)): #if the letters of word and solution match, make it green. If they don't, but it is somewhere else in the word, make it yellow.
             if word[i] == solution[i]:
                 partial_word[i] = word[i]
                 included.append(word[i])
             elif word[i] in solution: #it should be scored yellow since it appears somewhere else in the word
                 yellow[i] += word[i] #add the letter to the yellow letters in that column
+                included.append(word[i])
             else:
                 excluded.append(word[i]) #exclude it/score it as grey
             if solution.count(word[i]) > 1 and not word[i] in multiples:
                 multiples.append(word[i])
         print("I guessed %s." % (word))
-        print("Included:", included)
-        print("Excluded:", excluded)
-        print("Partial word:", partial_word)
-        print("Yellow letters:", yellow)
-        print("Multiples:", multiples)
+        #print("Included:", included)
+        #print("Excluded:", excluded)
+        #print("Partial word:", partial_word)
+        #print("Yellow letters:", yellow)
+        #print("Multiples:", multiples)
     if not "*" in partial_word:
-        print("The solution was %s." % (partial_word))
+        print("I correctly guessed %s in %i tries." % (word, guesses))
+        
         sys.exit()
+    else:
+        guesses += 1
+
+mode = int(input("Enter 0 to assist you in solving a wordle or 1 to enter a solution and test the computer."))
+if mode:
+    solution = input("Enter a word that you want the computer to try and find: ")
 
 while True:
     main()
-    input("Continue?")
-
-#check_word()
-
-#The check_word() function fails here because it is randomly choosing guesses from possible_words, instead of the top result. I believe this is because it is guessing from possible_words before it is sorted, although I don't know why.
+    
+    
