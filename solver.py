@@ -1,5 +1,4 @@
 import sys
-import csv
 # Open the file in read mode
 
 included = []
@@ -16,6 +15,11 @@ guesses = 0
 computer = 0
 count = 0
 guesslist = []
+chars = []
+computer = 0
+debug = False
+all_english = False
+all_fives = False
 
 def reset():
     global included, excluded, partial_word, yellow, singles, multiples
@@ -46,6 +50,8 @@ def ask():
         yellow[i] += input("Enter any new yellow letters in column " + str(i + 1) + ": ").lower().strip()
 
 def handle_word(i): #appends a word to possible_words, returns nothing
+    if len(i) != len(solution):
+        return
     for j in excluded:
         if j in i and not j in included: #we need to include a clause here that if the letter (represented by var j) is in both included and excluded for the word i, we shouldn't throw out the word.
             return
@@ -103,13 +109,13 @@ frequency_list = []
 
 def populate_frequencies(): #goes through the entire alphabet and creates frequency scores for each letter, appends to and sorts frequency list
     global frequency_list, letter_frequencies
-    if not all_english:
+    if all_english or all_fives:
+        letter_frequencies = letter_scores
+        frequency_list = score_list
+    else:
         for i in alphabet:
             letter_frequencies[i] = calculate_frequency(i)
         frequency_list = list(letter_frequencies.items())
-    else:
-        letter_frequencies = letter_scores
-        frequency_list = score_list
     frequency_list.sort(reverse=True, key=return_second)
 
 def score_words(): #takes all words in possible_words and assigns scores to them, appends scores to word_scores
@@ -160,19 +166,21 @@ def print_frequencies():
         count += 1
 
 def main():
-    global solution
-    if computer:
-        check_word()
-    else:
-        ask()
-    solve()
-    populate_frequencies()
-    score_words()
-    if debug:
-        print_frequencies()
-    print_words()
-    if debug:
-        input("\nContinue?")
+    choose_mode()
+    while True:
+        global solution
+        if computer:
+            check_word()
+        else:
+            ask()
+        solve()
+        populate_frequencies()
+        score_words()
+        if debug:
+            print_frequencies()
+        print_words()
+        if debug:
+            input("\nContinue?")
 
 def check_word():
     global included, excluded, partial_word, yellow, solution, final_guesses, guesses, guesslist, word_list
@@ -207,61 +215,72 @@ def check_word():
             print("Guess string:", guessstring)
         with open('computersolves.csv', 'a') as file:
             file.write(guessstring)
-        sys.exit()
+        main()
     else:
         guesses += 1
         if guesses > 20 and not (solution in word_list):
             print("Your word is not an official wordle solution.")
-            sys.exit()
+            main()
 
-computer = input("Enter 0 to assist you in solving a wordle or 1 (e for entire English solution set, d for debug mode) to enter a solution and test the computer: ")
-debug = False
-all_english = False
+def choose_mode():
+    global computer, debug, all_english, all_fives, chars, word_list, solution
+    computer = input("Enter 0 to assist you in solving a wordle or 1 (e for all English five-letter words, a for entire English solution set, d for debug mode) to enter a solution and test the computer: ")
 
-if 'e' in computer:
-    all_english = True
-    file = open('wordlist_fives.txt', 'r')
-    print("Resorting to english dictionary.")
-    data = file.read()
-    word_list = data.split()
-    chars = list(data)
-    for i in chars:
-        if i == "\n":
-            chars.remove(i)
-    file.close()
-else:
-    file = open('shuffled_real_wordles.txt', 'r')
-    data = file.read()
-    word_list = data.split()
-    chars = list(data)
-    for i in chars:
-        if i == "\n":
-            chars.remove(i)
-    file.close()
+    if 'e' in computer:
+        all_fives = True
+        file = open('wordlist_fives.txt', 'r')
+        print("Resorting to english dictionary.")
+        data = file.read()
+        word_list = data.split()
+        chars = list(data)
+        for i in chars:
+            if i == "\n":
+                chars.remove(i)
+        file.close()
+    if 'a' in computer:
+        all_english = True
+        file = open('words.txt', 'r')
+        print("Resorting to english dictionary.")
+        data = file.read()
+        word_list = []
+        for word in data.split():
+            print(word)
+            word_list.append(word)
+        #word_list = data.split()
+        chars = list(data)
+        for i in chars:
+            if i == "\n":
+                chars.remove(i)
+        file.close()
+    else:
+        file = open('shuffled_real_wordles.txt', 'r')
+        data = file.read()
+        word_list = data.split()
+        chars = list(data)
+        for i in chars:
+            if i == "\n":
+                chars.remove(i)
+        file.close()
 
-if 'd' in computer:
-    debug = True
+    if 'd' in computer:
+        debug = True
 
-if debug:
-    print("Word list:", word_list)
+    if debug:
+        print("Word list:", word_list)
 
-computer = ''.join(c for c in computer if c.isdigit())
-computer = int(computer)
+    computer = ''.join(c for c in computer if c.isdigit())
+    computer = int(computer)
 
-if computer:
-    solution = input("Enter a word that you want the computer to try and find: ")
-    '''if len(solution) > 5:
-        solution = solution[0:5:]
-        print("Your word has been shortened to %s." % (solution))
-    elif len(solution) < 5:
-        print("That is too short. Try again.")
-        sys.exit()'''
+    if computer:
+        solution = input("Enter a word that you want the computer to try and find: ")
+        '''if len(solution) > 5:
+            solution = solution[0:5:]
+            print("Your word has been shortened to %s." % (solution))
+        elif len(solution) < 5:
+            print("That is too short. Try again.")
+            main()'''
 
 reset()
-
-
-
-while True:
-    main()
+main()
 
 #The next step is to refactor the entire program to use local variables instead of global variables to reduce the chance of functions interfering with each other and make the program easier to debug
