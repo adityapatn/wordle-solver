@@ -140,7 +140,7 @@ def print_words(): #outputs the sorted list of possible words and their scores
     global final_guesses, guesses, count
     if not computer:
         print("")
-        print("%d total results out of %d possible answers (%.2f%%)." % (len(possible_words), len(word_list), 100.0 * len(possible_words) / len(word_list)))
+        print("%d total results out of %d possible answers (%3.2f%%)." % (len(possible_words), len(word_list), 100.0 * len(possible_words) / len(word_list)))
     final_guesses = list(zip(possible_words, word_scores))
     final_guesses.sort(reverse=True, key=return_second)
     if debug:

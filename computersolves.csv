@@ -6,7 +6,8 @@ alert,renal,early,large
 alert,canoe,sepia,media
 alert,scent,event
 alert,scent,event
-alert,piano,sigmaalert,hoist,night
+alert,piano,sigma
+alert,hoist,night
 alert
 alert,snare,zebra
 alert,piano,saucy,madam,magma,mamma
@@ -34,3 +35,4 @@ arite,orals,franc,prahu,graph
 arite,notal,sloat,ploat,gloat
 arite,notal,sloat,ploat,gloat,gloat
 irate,scone,solve
+alert,piano,saucy,madam,magma,mamma

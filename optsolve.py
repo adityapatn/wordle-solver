@@ -1,10 +1,27 @@
 
-computer = input("Enter 0 to assist you in solving a wordle or 1 (e for all English five-letter words, a for entire English solution set, d for debug mode) to enter a solution and test the computer: ")
-filename = "shuffled_real_wordles.txt"
-if 'e' in computer:
-    filename = "wordlist_fives.txt"
-if 'a' in computer:
-    filename = "words_alpha.txt"
-if 'd' in computer:
-    debug = True
-computer = int(''.join(c for c in computer if c.isdigit())) #removes any mode indicators from computer, leaving it as either 1 or 0
+
+with open("shuffled_real_wordles.txt", 'r') as file:
+        word_list = [line.strip() for line in file]
+
+#print(word_list)
+
+#a function that takes a guess and the solution and evaluates the guess
+#eventually I want this function to print the evaluated guess in green, yellow, and gray
+def evaluate(guess, solution):
+    green = [""] * 5
+    yellow = [""] * 5
+    excluded = ""
+
+    for i, j, k in zip(guess, solution, range(5)):
+        if i == j: #it's in the correct spot
+            green[k] = i
+        elif i in solution: #it's in the word, but not in this spot
+            yellow[k] += i
+        elif not i in excluded: #the letter isn't in the word at all, and we haven't excluded it yet
+            excluded += i
+    
+    return green, yellow, excluded
+
+#print(evaluate("happy", "flunk"))
+
+#a function that takes green, yellow, and excluded and returns the next best guess
