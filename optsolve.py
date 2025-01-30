@@ -35,14 +35,12 @@ def next_guess(green, yellow, excluded):
         for i in word:
             if i in excluded:
                 return False
-
-        '''
+        
         for i in range(len(word)):
             for j in yellow[i]:
                 if word[i] == j:
                     return False
-        '''
-
+        
         return True
 
     for word in word_list:
@@ -51,8 +49,6 @@ def next_guess(green, yellow, excluded):
     
     return possible_solutions
 
-#testing functions
-
-print("Evaluation:", evaluate("clang", "lunch"))
-x, y, z, = evaluate("clang", "lunch")
+x, y, z, = evaluate("flxyu", "flunk")
+print("Evaluation:", x, y, z)
 print(next_guess(x, y, z))
