@@ -118,6 +118,8 @@ def populate_frequencies(): #goes through the entire alphabet and creates freque
         frequency_list = list(letter_frequencies.items())
     frequency_list.sort(reverse=True, key=return_second)
 
+
+
 def score_words(): #takes all words in possible_words and assigns scores to them, appends scores to word_scores
     global word_scores
     word_scores = []
@@ -175,6 +177,8 @@ def main():
             ask()
         solve()
         populate_frequencies()
+        if debug:
+            print(frequency_list)
         score_words()
         if debug:
             print_frequencies()

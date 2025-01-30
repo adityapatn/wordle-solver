@@ -1,7 +1,11 @@
 with open("shuffled_real_wordles.txt", 'r') as file:
         word_list = [line.strip() for line in file]
 
-#print(word_list)
+letter_frequencies = [('e', 45.72), ('a', 36.3), ('r', 33.33), ('o', 27.96), ('t', 27.03), ('l', 26.66), ('i', 24.88), ('s', 24.81), ('n', 21.32), ('c', 17.69), ('u', 17.32), ('y', 15.76), ('d', 14.57), ('h', 14.42), ('p', 13.61), ('m', 11.72), ('g', 11.53), ('b', 10.42), ('f', 8.53), ('k', 7.79), ('w', 7.23), ('v', 5.67), ('z', 1.48), ('x', 1.37), ('q', 1.08), ('j', 1.0), ("'", 0.0), ('-', 0.0)]
+
+#a function that takes input from the user and returns a list green, a list yellow, and a string excluded
+def ask():
+    green_input = input("Enter the letters of the word you know are in the corect position, using any non-alphabetic character as a wildcard: ").strip().lower()
 
 #a function that takes a guess and the solution and evaluates the guess
 #eventually I want this function to print the evaluated guess in green, yellow, and gray
@@ -20,28 +24,30 @@ def evaluate(guess, solution):
     
     return green, yellow, excluded
 
+#a function that takes green, yellow, excluded, and a word to evaluate and returns whether it is a possible solution   
+def check_word(green, yellow, excluded, word):
+    for i, j in zip(word, green):
+        if j:
+            if i != j:
+                return False
+    
+    for i in word:
+        if i in excluded:
+            return False
+    
+    for i in range(len(word)):
+        for j in yellow[i]:
+            if word[i] == j:
+                return False
+            if not j in word:
+                return False
+    
+    return True
+
 #a function that takes green, yellow, and excluded and returns a list of possible next guesses (random/alphabetic order)
 def next_guess(green, yellow, excluded):
     global word_list
     possible_solutions = []
-    
-    #a function that takes green, yellow, excluded, and a word to evaluate and returns whether it's possible   
-    def check_word(green, yellow, excluded, word):
-        for i, j in zip(word, green):
-            if j:
-                if i != j:
-                    return False
-        
-        for i in word:
-            if i in excluded:
-                return False
-        
-        for i in range(len(word)):
-            for j in yellow[i]:
-                if word[i] == j:
-                    return False
-        
-        return True
 
     for word in word_list:
         if check_word(green, yellow, excluded, word):
@@ -49,6 +55,6 @@ def next_guess(green, yellow, excluded):
     
     return possible_solutions
 
-x, y, z, = evaluate("flxyu", "flunk")
-print("Evaluation:", x, y, z)
+x, y, z, = evaluate("fluxy", "flour")
+print("Green:", x, "Yellow:", y, "Grey:", z)
 print(next_guess(x, y, z))
