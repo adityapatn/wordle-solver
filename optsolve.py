@@ -1,5 +1,3 @@
-
-
 with open("shuffled_real_wordles.txt", 'r') as file:
         word_list = [line.strip() for line in file]
 
@@ -22,6 +20,38 @@ def evaluate(guess, solution):
     
     return green, yellow, excluded
 
-#print(evaluate("happy", "flunk"))
 
-#a function that takes green, yellow, and excluded and returns the next best guess
+
+#a function that takes green, yellow, and excluded and returns a list of possible next guesses (random/alphabetic order)
+def next_guess(green, yellow, excluded):
+    possible_solutions = []
+    
+    #a function that takes green, yellow, excluded, and a word to evaluate and returns whether it's possible   
+    def check_word(green, yellow, excluded, word):
+        for i, j in zip(word, green):
+            if j:
+                if i != j:
+                    return False
+        
+        for i in word:
+            if i in excluded:
+                return False
+
+        for i in range(len(word)):
+            for j in yellow[i]:
+                if word[i] == j:
+                    return False
+        
+        return True
+
+    for word in word_list:
+        if check_word(green, yellow, excluded, word):
+            possible_solutions += word
+    
+    return possible_solutions
+
+#testing functions
+
+print("Evaluation:", evaluate("clang", "lunch"))
+x, y, z, = evaluate("clang", "lunch")
+print(next_guess(x, y, z))
