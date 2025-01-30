@@ -20,10 +20,9 @@ def evaluate(guess, solution):
     
     return green, yellow, excluded
 
-
-
 #a function that takes green, yellow, and excluded and returns a list of possible next guesses (random/alphabetic order)
 def next_guess(green, yellow, excluded):
+    global word_list
     possible_solutions = []
     
     #a function that takes green, yellow, excluded, and a word to evaluate and returns whether it's possible   
@@ -37,16 +36,18 @@ def next_guess(green, yellow, excluded):
             if i in excluded:
                 return False
 
+        '''
         for i in range(len(word)):
             for j in yellow[i]:
                 if word[i] == j:
                     return False
-        
+        '''
+
         return True
 
     for word in word_list:
         if check_word(green, yellow, excluded, word):
-            possible_solutions += word
+            possible_solutions.append(word)
     
     return possible_solutions
 
