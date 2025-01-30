@@ -5,7 +5,21 @@ letter_frequencies = [('e', 45.72), ('a', 36.3), ('r', 33.33), ('o', 27.96), ('t
 
 #a function that takes input from the user and returns a list green, a list yellow, and a string excluded
 def ask():
+    excluded = input("Enter any excluded letters: ").strip().lower()
     green_input = input("Enter the letters of the word you know are in the corect position, using any non-alphabetic character as a wildcard: ").strip().lower()
+    green = list(green_input)
+    for i in green:
+        if not i.isalpha():
+            i = ""
+    
+    yellow_1 = input("Yellow letters in column 1:").strip().lower()
+    yellow_2 = input("Yellow letters in column 2:").strip().lower()
+    yellow_3 = input("Yellow letters in column 3:").strip().lower()
+    yellow_4 = input("Yellow letters in column 4:").strip().lower()
+    yellow_5 = input("Yellow letters in column 5:").strip().lower()
+    yellow = [yellow_1, yellow_2, yellow_3, yellow_4, yellow_5]
+
+    return green, yellow, excluded
 
 #a function that takes a guess and the solution and evaluates the guess
 #eventually I want this function to print the evaluated guess in green, yellow, and gray
@@ -55,6 +69,7 @@ def next_guess(green, yellow, excluded):
     
     return possible_solutions
 
-x, y, z, = evaluate("fluxy", "flour")
+#x, y, z, = evaluate("fluxy", "flour")
+x, y, z, = ask()
 print("Green:", x, "Yellow:", y, "Grey:", z)
 print(next_guess(x, y, z))
