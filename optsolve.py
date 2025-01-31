@@ -6,7 +6,7 @@ letter_frequencies = [('e', 45.72), ('a', 36.3), ('r', 33.33), ('o', 27.96), ('t
 #a function that takes input from the user and returns a list green, a list yellow, and a string excluded
 def ask():
     excluded = input("Enter any excluded letters: ").strip().lower()
-    green_input = input("Enter the letters of the word you know are in the corect position, using any non-alphabetic character as a wildcard: ").strip().lower()
+    green_input = input("Enter the letters of the word you know are in the correct position, using any non-alphabetic character as a wildcard: ").strip().lower()
     green = list(green_input)
     for i in green:
         if not i.isalpha():
@@ -40,22 +40,27 @@ def evaluate(guess, solution):
 
 #a function that takes green, yellow, excluded, and a word to evaluate and returns whether it is a possible solution   
 def check_word(green, yellow, excluded, word):
+    #print("Checkpoint 1!")
+    #print("Word:", word)
     for i, j in zip(word, green):
-        if j:
+        if j and j.isalpha():
             if i != j:
                 return False
     
+    #print("Checkpoint 2!")
     for i in word:
         if i in excluded:
             return False
     
-    for i in range(len(word)):
+    #print("Checkpoint 3!")
+    for i in range(len(yellow)):
         for j in yellow[i]:
             if word[i] == j:
                 return False
             if not j in word:
                 return False
     
+    #print("It works!")
     return True
 
 #a function that takes green, yellow, and excluded and returns a list of possible next guesses (random/alphabetic order)
@@ -73,3 +78,4 @@ def next_guess(green, yellow, excluded):
 x, y, z, = ask()
 print("Green:", x, "Yellow:", y, "Grey:", z)
 print(next_guess(x, y, z))
+#print(check_word(x, y, z, "apnea"))
