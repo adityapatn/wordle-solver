@@ -3,10 +3,6 @@ with open("shuffled_real_wordles.txt", 'r') as file:
 
 letter_frequencies = {'e': 45.72, 'a': 36.3, 'r': 33.33, 'o': 27.96, 't': 27.03, 'l': 26.66, 'i': 24.88, 's': 24.81, 'n': 21.32, 'c': 17.69, 'u': 17.32, 'y': 15.76, 'd': 14.57, 'h': 14.42, 'p': 13.61, 'm': 11.72, 'g': 11.53, 'b': 10.42, 'f': 8.53, 'k': 7.79, 'w': 7.23, 'v': 5.67, 'z': 1.48, 'x': 1.37, 'q': 1.08, 'j': 1.0, "'": 0.0, '-': 0.0}
 
-green = [""] * 5
-yellow = [""] * 5
-excluded = ""
-
 #a function that takes previous values of a variable, input from the user, and returns a list green, a list yellow, and a string excluded
 def ask(green_start, yellow_start, excluded_start):
     yellow = yellow_start
@@ -100,6 +96,9 @@ def assist_wordle():
             solved = True
         #print("Green:", green, "Yellow:", yellow, "Grey:", excluded)
         solutions = next_guess(green, yellow, excluded)
+        print("")
+        print("%d total results out of %d possible answers (%3.2f%%)." % (len(solutions), len(word_list), 100.0 * len(solutions) / len(word_list)))
+        print("")
         for i in range(5):
             print("%d: %s (%0.2f)" % (i + 1, solutions[i][0], solutions[i][1]))
 
@@ -111,8 +110,28 @@ def solve_wordle():
     excluded = ""
     solution = input("Enter the solution: ").strip().lower()
     first_guess = input("Enter an optional first guess: ").strip().lower()
+    guesses = []
+
+    if first_guess:
+        guess = first_guess
+        green, yellow, excluded = evaluate(green, yellow, excluded, first_guess, solution)
+    else:
+        guess = next_guess(green, yellow, excluded)[0]
+    guesses.append(guess)
+    
+    while guess[0] != solution:
+        green, yellow, excluded = evaluate(green, yellow, excluded, guess[0], solution)
+        guess = next_guess(green, yellow, excluded)[0]
+        guesses.append(guess)
+    
+    for i in range(len(guesses)):
+        print("%d: %s (%3.2f)" % (i + 1, guesses[i][0], guesses[i][1]))
+    
+    print("")
+    print("I guessed the word in %d guesses." % (len(guesses)))
+    raise KeyboardInterrupt()
 
 try:
-    assist_wordle()
+    solve_wordle()
 except KeyboardInterrupt:
     print("\nExiting program.")
