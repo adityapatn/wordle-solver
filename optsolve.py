@@ -1,7 +1,6 @@
-with open("shuffled_real_wordles.txt", 'r') as file:
-        word_list = [line.strip() for line in file]
-
 letter_frequencies = {'e': 45.72, 'a': 36.3, 'r': 33.33, 'o': 27.96, 't': 27.03, 'l': 26.66, 'i': 24.88, 's': 24.81, 'n': 21.32, 'c': 17.69, 'u': 17.32, 'y': 15.76, 'd': 14.57, 'h': 14.42, 'p': 13.61, 'm': 11.72, 'g': 11.53, 'b': 10.42, 'f': 8.53, 'k': 7.79, 'w': 7.23, 'v': 5.67, 'z': 1.48, 'x': 1.37, 'q': 1.08, 'j': 1.0, "'": 0.0, '-': 0.0}
+
+word_length = 5
 
 #a function that takes previous values of a variable, input from the user, and returns a list green, a list yellow, and a string excluded
 def ask(green_start, yellow_start, excluded_start):
@@ -10,19 +9,16 @@ def ask(green_start, yellow_start, excluded_start):
     excluded = excluded_start
     excluded += input("Enter any excluded letters: ").strip().lower()
     green_input = input("Enter the letters of the word you know are in the correct position, using any non-alphabetic character as a wildcard: ").strip().lower()
-    while len(green_input) < 5:
+    while len(green_input) < word_length:
         green_input += "*"
     
     #green_input is now a five-character string
-    for i in range(5):
+    for i in range(word_length):
         if green_input[i].isalpha():
             green[i] = green_input[i]
-
-    yellow[0] += input("Yellow letters in column 1:").strip().lower()
-    yellow[1] += input("Yellow letters in column 2:").strip().lower()
-    yellow[2] += input("Yellow letters in column 3:").strip().lower()
-    yellow[3] += input("Yellow letters in column 4:").strip().lower()
-    yellow[4] += input("Yellow letters in column 5:").strip().lower()
+    
+    for i in range(word_length):
+        yellow[i] += input("Yellow letters in column %i:" % (i + 1)).strip().lower()
 
     return green, yellow, excluded
 
@@ -32,7 +28,7 @@ def evaluate(green_start, yellow_start, excluded_start, guess, solution):
     yellow = yellow_start
     excluded = excluded_start
 
-    for i, j, k in zip(guess, solution, range(5)):
+    for i, j, k in zip(guess, solution, range(word_length)):
         if i == j: #it's in the correct spot
             green[k] = i
         elif i in solution: #it's in the word, but not in this spot
@@ -85,8 +81,8 @@ def next_guess(green, yellow, excluded):
     return possible_solutions
 
 def assist_wordle():
-    green = [""] * 5
-    yellow = [""] * 5
+    green = [""] * word_length
+    yellow = [""] * word_length
     excluded = ""
     solved = False
 
@@ -97,16 +93,20 @@ def assist_wordle():
         #print("Green:", green, "Yellow:", yellow, "Grey:", excluded)
         solutions = next_guess(green, yellow, excluded)
         print("")
-        print("%d total results out of %d possible answers (%3.2f%%)." % (len(solutions), len(word_list), 100.0 * len(solutions) / len(word_list)))
+        try:
+            print("%d total results out of %d possible answers (%3.2f%%)." % (len(solutions), len(word_list), 100.0 * len(solutions) / len(word_list)))
+        except ZeroDivisionError:
+            print("There are no valid wordle solutions for that input.")
+            raise KeyboardInterrupt()
         print("")
-        for i in range(5):
+        for i in range(min(5, len(solutions))):
             print("%d: %s (%0.2f)" % (i + 1, solutions[i][0], solutions[i][1]))
 
 # a function that takes a solution word and an optional first guess, and tries to guess the word.
 #eventually I want this function to print the evaluated guess in green, yellow, and gray
 def solve_wordle():
-    green = [""] * 5
-    yellow = [""] * 5
+    green = [""] * word_length
+    yellow = [""] * word_length
     excluded = ""
     solution = input("Enter the solution: ").strip().lower()
     first_guess = input("Enter an optional first guess: ").strip().lower()
@@ -128,10 +128,21 @@ def solve_wordle():
         print("%d: %s (%3.2f)" % (i + 1, guesses[i][0], guesses[i][1]))
     
     print("")
-    print("I guessed the word in %d guesses." % (len(guesses)))
+    print("The computer solved the wordle in %d guesses." % (len(guesses)))
     raise KeyboardInterrupt()
 
-try:
-    solve_wordle()
-except KeyboardInterrupt:
-    print("\nExiting program.")
+with open("shuffled_real_wordles.txt", 'r') as file:
+    word_list = [line.strip() for line in file]
+
+def main():
+    mode = bool(input("Press enter to assist in solving a wordle, or type 1 to test the computer.").strip().lower())
+    #english_set = bool(input("Press enter to use the wordle solution set, or type 1 to use all English five-letter words.").strip().lower())
+    try:
+        if mode:
+            solve_wordle()
+        else:
+            assist_wordle()
+    except KeyboardInterrupt:
+        print("\nExiting program.")
+
+main()
