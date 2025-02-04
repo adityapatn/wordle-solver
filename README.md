@@ -1,1 +1,1 @@
-To run, use optsolve.py and shuffled_real_word.txt.
+To run this wordle solver yourself, use optsolve.py, shuffled_real_wordles.txt, and an empty computersolves.csv file for recording solves that the computer makes.
