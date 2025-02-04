@@ -101,7 +101,7 @@ def assist_wordle():
         guesses.append(guess)
         print("")
         try:
-            print("%d total results out of %d possible answers (%3.2f%%)." % (len(solutions), len(word_list), 100.0 * len(solutions) / len(word_list)))
+            print("%d out of %d (%3.2f%%)." % (len(solutions), len(word_list), 100.0 * len(solutions) / len(word_list)))
         except ZeroDivisionError:
             print("There are no valid wordle solutions for that input.")
             raise KeyboardInterrupt()
@@ -111,7 +111,7 @@ def assist_wordle():
         if len(solutions) < 2:
             write_result(guesses)
 
-#a function that takes a list of tuples ("", float) and writes the guesses to computersolves.csv
+#a function that takes a list of tuples ("", float) and writes the guesses to solves.csv
 def write_result(guess_list):
     string_list = []
     for i in guess_list:
@@ -121,7 +121,7 @@ def write_result(guess_list):
     string_list = list(dict.fromkeys(string_list)) #remove possible duplicates: if there are 2 possible solutions and the first is proven correct, we need to rule out the second for the computer to confirm it as the solution and end the loop.
 
     result = ','.join(string_list) + "\n"
-    with open('computersolves.csv', 'a') as file:
+    with open('solves.csv', 'a') as file:
         file.write(result)
     
     raise KeyboardInterrupt()
@@ -145,7 +145,7 @@ def solve_wordle():
         guess = solutions[0]
     
     guesses.append(guess)
-    print("%i: %s: %d total results out of %d possible answers (%3.2f%%)" % (len(guesses), guess[0], len(solutions), len(word_list), 100.0 * len(solutions) / len(word_list)))    
+    print("%i: %s: %d out of %d (%3.2f%%)" % (len(guesses), guess[0], len(solutions), len(word_list), 100.0 * len(solutions) / len(word_list)))    
 
     
     while guess[0] != solution:
@@ -153,7 +153,7 @@ def solve_wordle():
         solutions = next_guess(green, yellow, excluded)
         guess = solutions[0]
         guesses.append(guess)
-        print("%i: %s: %d total results out of %d possible answers (%3.2f%%)" % (len(guesses), guess[0], len(solutions), len(word_list), 100.0 * len(solutions) / len(word_list)))  
+        print("%i: %s: %d out of %d (%3.2f%%)" % (len(guesses), guess[0], len(solutions), len(word_list), 100.0 * len(solutions) / len(word_list)))  
     
     print("")
     print("The computer solved the wordle in %d guesses." % (len(guesses)))
