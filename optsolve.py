@@ -85,6 +85,11 @@ def assist_wordle():
     yellow = [""] * word_length
     excluded = ""
     solved = False
+    guesses = []
+
+    first_guess = input("Your first guess ('alert' is optimal)? ").strip().lower()
+    if first_guess:
+        guesses.append(first_guess)
 
     while not solved:
         green, yellow, excluded = ask(green, yellow, excluded)
@@ -92,6 +97,8 @@ def assist_wordle():
             solved = True
         #print("Green:", green, "Yellow:", yellow, "Grey:", excluded)
         solutions = next_guess(green, yellow, excluded)
+        guess = solutions[0][0]
+        guesses.append(guess)
         print("")
         try:
             print("%d total results out of %d possible answers (%3.2f%%)." % (len(solutions), len(word_list), 100.0 * len(solutions) / len(word_list)))
@@ -101,6 +108,23 @@ def assist_wordle():
         print("")
         for i in range(min(5, len(solutions))):
             print("%d: %s (%0.2f)" % (i + 1, solutions[i][0], solutions[i][1]))
+        if len(solutions) < 2:
+            write_result(guesses)
+
+#a function that takes a list of tuples ("", float) and writes the guesses to computersolves.csv
+def write_result(guess_list):
+    string_list = []
+    for i in guess_list:
+        string_list.append(i[0])
+    #string_list is a list of strings
+
+    string_list = list(dict.fromkeys(string_list)) #remove possible duplicates: if there are 2 possible solutions and the first is proven correct, we need to rule out the second for the computer to confirm it as the solution and end the loop.
+
+    result = ','.join(string_list) + "\n"
+    with open('computersolves.csv', 'a') as file:
+        file.write(result)
+    
+    raise KeyboardInterrupt()
 
 # a function that takes a solution word and an optional first guess, and tries to guess the word.
 #eventually I want this function to print the evaluated guess in green, yellow, and gray
@@ -111,25 +135,29 @@ def solve_wordle():
     solution = input("Enter the solution: ").strip().lower()
     first_guess = input("Enter an optional first guess: ").strip().lower()
     guesses = []
+    solutions = []
 
     if first_guess:
-        guess = first_guess
-        green, yellow, excluded = evaluate(green, yellow, excluded, first_guess, solution)
+        guess = (first_guess, 0)
+        solutions = [0] * 2315
     else:
-        guess = next_guess(green, yellow, excluded)[0]
+        solutions = next_guess(green, yellow, excluded)
+        guess = solutions[0]
+    
     guesses.append(guess)
+    print("%i: %s: %d total results out of %d possible answers (%3.2f%%)" % (len(guesses), guess[0], len(solutions), len(word_list), 100.0 * len(solutions) / len(word_list)))    
+
     
     while guess[0] != solution:
         green, yellow, excluded = evaluate(green, yellow, excluded, guess[0], solution)
-        guess = next_guess(green, yellow, excluded)[0]
+        solutions = next_guess(green, yellow, excluded)
+        guess = solutions[0]
         guesses.append(guess)
-    
-    for i in range(len(guesses)):
-        print("%d: %s (%3.2f)" % (i + 1, guesses[i][0], guesses[i][1]))
+        print("%i: %s: %d total results out of %d possible answers (%3.2f%%)" % (len(guesses), guess[0], len(solutions), len(word_list), 100.0 * len(solutions) / len(word_list)))  
     
     print("")
     print("The computer solved the wordle in %d guesses." % (len(guesses)))
-    raise KeyboardInterrupt()
+    write_result(guesses)
 
 with open("shuffled_real_wordles.txt", 'r') as file:
     word_list = [line.strip() for line in file]

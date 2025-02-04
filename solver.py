@@ -1,3 +1,5 @@
+#DEPRECATED: use optsolve.py instead.
+
 import sys
 # Open the file in read mode
 
@@ -286,5 +288,3 @@ def choose_mode():
 
 reset()
 main()
-
-#The next step is to refactor the entire program to use local variables instead of global variables to reduce the chance of functions interfering with each other and make the program easier to debug
