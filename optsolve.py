@@ -151,7 +151,11 @@ def solve_wordle():
     while guess[0] != solution:
         green, yellow, excluded = evaluate(green, yellow, excluded, guess[0], solution)
         solutions = next_guess(green, yellow, excluded)
-        guess = solutions[0]
+        try:
+            guess = solutions[0]
+        except IndexError:
+            print("That is not a possible wordle solution.")
+            raise KeyboardInterrupt
         guesses.append(guess)
         print("%i: %s: %d out of %d (%3.2f%%)" % (len(guesses), guess[0], len(solutions), len(word_list), 100.0 * len(solutions) / len(word_list)))  
     
