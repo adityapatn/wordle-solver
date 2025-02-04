@@ -89,7 +89,7 @@ def assist_wordle():
 
     first_guess = input("Your first guess ('alert' is optimal)? ").strip().lower()
     if first_guess:
-        guesses.append(first_guess)
+        guesses.append((first_guess, 0))
 
     while not solved:
         green, yellow, excluded = ask(green, yellow, excluded)
@@ -97,11 +97,11 @@ def assist_wordle():
             solved = True
         #print("Green:", green, "Yellow:", yellow, "Grey:", excluded)
         solutions = next_guess(green, yellow, excluded)
-        guess = solutions[0][0]
+        guess = solutions[0]
         guesses.append(guess)
         print("")
         try:
-            print("%d out of %d (%3.2f%%)." % (len(solutions), len(word_list), 100.0 * len(solutions) / len(word_list)))
+            print("%d out of %d (%3.2f%%) possible answers." % (len(solutions), len(word_list), 100.0 * len(solutions) / len(word_list)))
         except ZeroDivisionError:
             print("There are no valid wordle solutions for that input.")
             raise KeyboardInterrupt()
