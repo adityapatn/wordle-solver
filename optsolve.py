@@ -87,7 +87,7 @@ def assist_wordle():
     solved = False
     guesses = []
 
-    first_guess = input("Your first guess ('alert' is optimal)? ").strip().lower()
+    first_guess = input("Enter your first guess ('alert' is optimal): ").strip().lower()
     if first_guess:
         guesses.append((first_guess, 0))
 
@@ -113,6 +113,9 @@ def assist_wordle():
 
 #a function that takes a list of tuples ("", float) and writes the guesses to solves.csv
 def write_result(guess_list):
+    record = bool(input("Press enter to record this solve."))
+    if record:
+        raise KeyboardInterrupt
     string_list = []
     for i in guess_list:
         string_list.append(i[0])
