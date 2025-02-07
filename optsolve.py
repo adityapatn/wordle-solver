@@ -99,7 +99,7 @@ def assist_wordle():
     solved = False
     guesses = []
 
-    first_guess = input("Enter your first guess ('alert' is optimal): ").strip().lower()
+    first_guess = input("Enter your first guess (default is top result): ").strip().lower()
     if first_guess:
         guesses.append((first_guess, 0))
 
@@ -109,8 +109,7 @@ def assist_wordle():
             solved = True
         #print("Green:", green, "Yellow:", yellow, "Grey:", excluded)
         solutions = next_guess(green, yellow, excluded)
-        guess = solutions[0]
-        guesses.append(guess)
+        
         print("")
         try:
             print("%d out of %d (%3.2f%%) possible answers." % (len(solutions), len(word_list), 100.0 * len(solutions) / len(word_list)))
@@ -118,8 +117,17 @@ def assist_wordle():
             print("There are no valid wordle solutions for that input.")
             raise KeyboardInterrupt()
         print("")
+        
         for i in range(min(5, len(solutions))):
             print("%d: %s (%0.2f)" % (i + 1, solutions[i][0], solutions[i][1]))
+        
+        override_guess = input("Enter your guess (default is top result): ").strip().lower()
+        if override_guess:
+            guess = (override_guess, 0)
+        else:
+            guess = solutions[0]
+        guesses.append(guess)
+
         if len(solutions) < 2:
             write_result(guesses)
 
