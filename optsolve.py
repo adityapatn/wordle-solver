@@ -8,7 +8,7 @@ def ask(green_start, yellow_start, excluded_start):
     green = green_start
     excluded = excluded_start
     excluded += input("Enter any excluded letters: ").strip().lower()
-    green_input = input("Enter the letters of the word you know are in the correct position, using any non-alphabetic character as a wildcard: ").strip().lower()
+    green_input = input("Enter the green letters, using any non-alphabetic character as a wildcard: ").strip().lower()
     while len(green_input) < word_length:
         green_input += "*"
     
@@ -17,8 +17,20 @@ def ask(green_start, yellow_start, excluded_start):
         if green_input[i].isalpha():
             green[i] = green_input[i]
     
+    #for i in range(word_length):
+    #    yellow[i] += input("Yellow letters in column %i:" % (i + 1)).strip().lower()
+
+    yellow_input = input("Enter the yellow letters, using any non-alphabetic character as a placeholder: ").strip().lower()
+    while len(yellow_input) < word_length:
+        yellow_input += "*"
+    #yellow input is now a five-character string
+
+    if len(yellow_input) > 5:
+        yellow_input = yellow_input[:5] #chop off any characters after the fifth
+
     for i in range(word_length):
-        yellow[i] += input("Yellow letters in column %i:" % (i + 1)).strip().lower()
+        if yellow_input[i].isalpha():
+            yellow[i] = yellow_input[i]
 
     return green, yellow, excluded
 
