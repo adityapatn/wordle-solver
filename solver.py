@@ -171,6 +171,7 @@ def print_frequencies():
 
 def main():
     choose_mode()
+    populate_frequencies()
     while True:
         global solution
         if computer:
@@ -178,7 +179,6 @@ def main():
         else:
             ask()
         solve()
-        populate_frequencies()
         if debug:
             print(frequency_list)
         score_words()
