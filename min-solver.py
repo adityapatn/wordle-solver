@@ -30,6 +30,10 @@ def ask():
     for i in excluded_input:
         excluded.append(i)
     
+    for letter in included:
+        if letter in excluded:
+            singles.append(letter)
+    
     partial_word_input = input("Enter the letters of the word you know are in the correct position (all green letters), using * as a wildcard (no green in the column): " ).lower().strip()
     while len(partial_word_input) < word_length:
         partial_word_input += "*"
@@ -40,7 +44,7 @@ def ask():
             partial_word[i] = partial_word_input[i]
 
     yellow_input = input("Enter the yellow letters in the word separated by commas: ").split(",")
-    print(yellow_input)
+    #print(yellow_input)
     while len(yellow_input) < 5:
         yellow_input.append("")
     
@@ -49,12 +53,9 @@ def ask():
 
 def check_word(word):
     global included, excluded, multiples, partial_word, yellow, singles
-    for j in included:
-        if j in excluded:
-            singles.append(j)
 
     for letter in excluded:
-        if letter in word:
+        if (letter in word) and not (letter in singles):
             return False
 
     for letter in included:
